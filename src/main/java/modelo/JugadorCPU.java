@@ -4,6 +4,7 @@
  */
 package modelo;
 
+import estructuras.Cola;
 import estructuras.Lista;
 
 /**
@@ -24,10 +25,10 @@ public class JugadorCPU extends Jugador {
         return contador;
     }
     public void asignarPokemonAleatorios(Lista catalogo){
-        int totalPokemon = contarElementos(catalago);
+        int totalPokemon = contarElementos(catalogo);
         while (pokedex.getTamano()<4){
             int indice = (int)(Math.random()*totalPokemon);
-            Pokemon original = catalago.obtener(indice);
+            Pokemon original = catalogo.obtener(indice);
             
             if(original!= null){
                 agregarPokemonCPU(original);
