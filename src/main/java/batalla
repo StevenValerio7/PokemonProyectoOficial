@@ -1,0 +1,92 @@
+package batalla;
+import modelo.Jugador;
+import modelo.JugadorCPU;
+import modelo.Pokemon;
+import java.util.Scanner;
+
+/**
+ *
+ * @author sebas
+ */
+public class ManejoBatalla {
+     public static Jugador iniciarBatalla(Jugador j1, Jugador j2, Scanner scanner) {
+        System.out.println("\n--- ¡INICIA LA BATALLA! ---");
+        System.out.println(j1.getNombre() + " VS " + j2.getNombre());
+        
+        // Restauramos los equipos si tienen vida negativa por algun motivo, o los presentamos
+        System.out.print("Equipo J1: "); j1.mostrarEquipo();
+        System.out.print("Equipo J2: "); j2.mostrarEquipo();
+        
+        while (j1.tienePokemonVivos() && j2.tienePokemonVivos()) {
+            Pokemon p1 = j1.getPokemonActivo();
+            Pokemon p2 = j2.getPokemonActivo();
+            
+            System.out.println("\nEn combate:");
+            System.out.println(j1.getNombre() + " -> " + p1.toString());
+            System.out.println(j2.getNombre() + " -> " + p2.toString());
+            
+            // Turno Jugador 1
+            if (!(j1 instanceof JugadorCPU)) {
+                System.out.println("\nTurno de " + j1.getNombre() + ":");
+                System.out.println("1. Atacar");
+                System.out.println("2. Cambiar Pokémon");
+                System.out.print("Elige una acción: ");
+                int accion = scanner.nextInt();
+                
+                if (accion == 2) {
+                    j1.cambiarPokemon();
+                    p1 = j1.getPokemonActivo();
+                } else {
+                    int dano = p1.atacar();
+                    p2.recibirDano(dano);
+                    System.out.println(p2.getNombre() + " recibe " + dano + " de daño!");
+                }
+            } else {
+                System.out.println("\nTurno de " + j1.getNombre() + " (CPU):");
+                int dano = p1.atacar();
+                p2.recibirDano(dano);
+                System.out.println(p2.getNombre() + " recibe " + dano + " de daño!");
+            }
+            
+            if (!p2.estaVivo()) {
+                j2.pokemonDerrotado();
+                continue; // Siguiente ronda, p2 saca nuevo pokemon
+            }
+            
+            // Turno Jugador 2
+            if (!(j2 instanceof JugadorCPU)) {
+                System.out.println("\nTurno de " + j2.getNombre() + ":");
+                System.out.println("1. Atacar");
+                System.out.println("2. Cambiar Pokémon");
+                System.out.print("Elige una acción: ");
+                int accion = scanner.nextInt();
+                
+                if (accion == 2) {
+                    j2.cambiarPokemon();
+                } else {
+                    int dano = p2.atacar();
+                    p1.recibirDano(dano);
+                    System.out.println(p1.getNombre() + " recibe " + dano + " de daño!");
+                }
+            } else {
+                System.out.println("\nTurno de " + j2.getNombre() + " (CPU):");
+                int dano = p2.atacar();
+                p1.recibirDano(dano);
+                System.out.println(p1.getNombre() + " recibe " + dano + " de daño!");
+            }
+            
+            if (!p1.estaVivo()) {
+                j1.pokemonDerrotado();
+            }
+        }
+        
+        if (j1.tienePokemonVivos()) {
+            System.out.println("\n¡" + j1.getNombre() + " HA GANADO LA BATALLA!");
+            return j1;
+        } else {
+            System.out.println("\n¡" + j2.getNombre() + " HA GANADO LA BATALLA!");
+            return j2;
+        }
+    }
+}
+    
