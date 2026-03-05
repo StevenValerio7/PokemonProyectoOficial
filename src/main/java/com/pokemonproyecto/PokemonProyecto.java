@@ -2,15 +2,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
 
-package com.pokemonprojecto;
+package com.pokemonproyecto;
 
 /**
  *
  * @author steve
  */
-public class PokemonProjecto {
+public class PokemonProyecto {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");rnrthnryhy
+        System.out.println("Hello World!");
     }
 }
