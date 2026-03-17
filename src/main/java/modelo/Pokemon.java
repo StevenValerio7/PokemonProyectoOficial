@@ -18,6 +18,7 @@ public abstract class Pokemon {
     private int defensaEspecial;
     
     private int cooldownAtaqueEspecial; // es solo un dato porque el paquete ManejoBatalla lo controla
+    private int cooldownDefensaEspecial;
 
     public Pokemon(String nombre, String tipo, int hp, int ataque, int defensa, int ataqueEspecial, int defensaEspecial) {
         this.nombre = nombre;
@@ -27,7 +28,9 @@ public abstract class Pokemon {
         this.defensa = defensa;
         this.ataqueEspecial = ataqueEspecial;
         this.defensaEspecial = defensaEspecial;
+        
         this.cooldownAtaqueEspecial = 0;
+        this.cooldownDefensaEspecial = 0;
     }
 
     public String getNombre() {
@@ -62,6 +65,11 @@ public abstract class Pokemon {
         return cooldownAtaqueEspecial;
     }
 
+    public int getCooldownDefensaEspecial() {
+        return cooldownDefensaEspecial;
+    }
+    
+
     public void setHp(int hp) {
         this.hp = hp;
     }
@@ -69,8 +77,21 @@ public abstract class Pokemon {
     public void setCooldownAtaqueEspecial(int cooldownAtaqueEspecial) {
         this.cooldownAtaqueEspecial = cooldownAtaqueEspecial;
     }
+
+    public void setCooldownDefensaEspecial(int cooldownDefensaEspecial) {
+        this.cooldownDefensaEspecial = cooldownDefensaEspecial;
+    }
+    
     
     //Metodos 
+    public int defender(int danio){
+        int danioReducido = danio - defensa;
+        
+        if(danioReducido < 0){
+           danioReducido = 0; 
+        }
+        return danioReducido;
+    }
     public void recibirDa_io(int danio){
         hp -= danio;
         if(hp<0){
