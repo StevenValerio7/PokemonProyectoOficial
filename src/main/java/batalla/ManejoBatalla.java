@@ -11,6 +11,7 @@ import modelo.Pokemon;
  *
  * @author jimen
  */
+//Lista para GUI
 public class ManejoBatalla {
     private Jugador jugador;
     private JugadorCPU cpu;
