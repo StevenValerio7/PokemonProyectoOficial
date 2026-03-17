@@ -61,12 +61,13 @@ public class Cola {
         }
     }
     
-    public void mostrarCola() {
+    public String mostrarCola() {
+        String resultado = "";
         Nodo actual = frente;
         while (actual != null) {
-            System.out.print("[" + actual.pokemon.getNombre() + "] ");
+            resultado += "[" + actual.pokemon.getNombre() + "] ";
             actual = actual.siguiente;
         }
-        System.out.println();
+        return resultado;
     }
 }
