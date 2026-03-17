@@ -55,6 +55,7 @@ public class Jugador {
         if(contarRepetidos(p.getNombre())>=2){
             return; //maximo dos iguales 
         }
+        pokedex.encolar(p);
     }
     
     
