@@ -22,7 +22,7 @@ public class PokemonAgua extends Pokemon {
         } else if (enemigo.getTipo().equals("Normal")){
             danio/=2; //debil contra normal
         }
-        System.out.println(getNombre()+"usa Pistola Agua!"); 
+        
         return danio;
     }
 
@@ -32,7 +32,7 @@ public class PokemonAgua extends Pokemon {
         if (enemigo.getTipo().equals("Fuego")){
             danio = 85;
         }
-        System.out.println(getNombre()+ "usa Ataque Especial");
+        
         return danio;
     }
 

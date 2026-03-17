@@ -24,23 +24,25 @@ public class JugadorCPU extends Jugador {
         }
         return contador;
     }
-    public void asignarPokemonAleatorios(Lista catalogo){
+    public String asignarPokemonAleatorios(Lista catalogo){
         int totalPokemon = contarElementos(catalogo);
+        String resultado = "";
         while (pokedex.getTamano()<4){
             int indice = (int)(Math.random()*totalPokemon);
             Pokemon original = catalogo.obtener(indice);
             
             if(original!= null){
                 agregarPokemonCPU(original);
-                System.out.println("CPU obtuvo: "+original.getNombre());
+                 resultado += "CPU obtuvo: "+original.getNombre() + "\n";
             }
         }
+        return resultado;
     }
             
      
     @Override
-    public void cambiarPokemon(){
-        System.out.println("CPU no cambia de jugador");
+    public String cambiarPokemon(){
+        return "CPU no cambia de jugador";
     }
     
     

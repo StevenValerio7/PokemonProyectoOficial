@@ -35,16 +35,17 @@ public class Jugador {
         }
         return contador;
     }
-    public void agregarPokemon(Pokemon p){
+    public String agregarPokemon(Pokemon p){
         if (pokedex.getTamano() >= 4) {
-        System.out.println("El equipo ya tiene 4 Pokemon.");
-        return;
+        return "El equipo ya tiene 4 Pokemon.";
+        
     }
     if (contarRepetidos(p.getNombre())>0) {
-        System.out.println("No se permiten Pokemon repetidos.");
-        return;
+        return "No se permiten Pokemon repetidos.";
+      
     }
     pokedex.encolar(p);
+    return p.getNombre() + " fue agregado al equipo.";
         
     }
     public void agregarPokemonCPU(Pokemon p){
@@ -63,27 +64,27 @@ public class Jugador {
     public boolean tienePokemonVivos(){
         return !pokedex.estaVacia();
     }
-    public void pokemonDerrotado(){
+    public String pokemonDerrotado(){
         Pokemon derrotado = pokedex.desencolar();
         if(derrotado !=null){
-            System.out.println(derrotado.getNombre()+"ha sido derrotado!");
+            return derrotado.getNombre() + " ha sido derrotado. Adelante " +
+                    pokedex.verFrente().getNombre(); 
+        } else {
+            return derrotado.getNombre() + " ha sido derrotado. No quedan Pokemon.";
         }
-        if(!pokedex.estaVacia()){
-            System.out.println("Adelante "+pokedex.verFrente().getNombre());
-        }
-    }
-    public void cambiarPokemon(){
+        
+    } 
+    public String cambiarPokemon(){
         if(pokedex.getTamano()>1){
             Pokemon actual = pokedex.verFrente();
-            System.out.println(nombre+ "retira a "+actual.getNombre());
             pokedex.cambiarPokemonActivo();
-            System.out.println("Adelante "+pokedex.verFrente().getNombre());
+            return nombre+ "retira a "+actual.getNombre() +
+                    "Adelante "+pokedex.verFrente().getNombre();
         } else {
-            System.out.println("No hay otros Pokemon disponibles");
+           return "No hay otros Pokemon disponibles";
         }  
     }
     public void mostrarEquipo() {
-        System.out.print("Equipo de " + nombre + ": ");
         pokedex.mostrarCola();
     }
     
