@@ -10,7 +10,7 @@ package modelo;
  */
 public class PokemonFuego extends Pokemon {
 
-    public PokemonFuego(String nombre, String tipo, int hp, int ataque, int defensa, int ataqueEspecial, int defensaEspecial) {
+    public PokemonFuego(String nombre) {
         super(nombre, "Fuego", 115, 70, 45, 85, 70);
     }
 
