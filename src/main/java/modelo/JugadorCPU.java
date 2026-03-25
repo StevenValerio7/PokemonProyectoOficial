@@ -4,8 +4,8 @@
  */
 package modelo;
 
-import estructuras.Cola;
-import estructuras.Lista;
+import estructuras.ColaTurnos;
+import estructuras.ListaPokemon;
 
 /**
  *
@@ -13,18 +13,18 @@ import estructuras.Lista;
  */
 public class JugadorCPU extends Jugador {
 
-    public JugadorCPU(String nombre, Cola pokedex) {
+    public JugadorCPU(String nombre, ColaTurnos pokedex) {
         super(nombre, pokedex);
     }
     
-    private int contarElementos(Lista catalogo){
+    private int contarElementos(ListaPokemon catalogo){
         int contador = 0;
         while(catalogo.obtener(contador)!=null){
             contador++;
         }
         return contador;
     }
-    public String asignarPokemonAleatorios(Lista catalogo){
+    public String asignarPokemonAleatorios(ListaPokemon catalogo){
         int totalPokemon = contarElementos(catalogo);
         String resultado = "";
         while (pokedex.getTamano()<4){
