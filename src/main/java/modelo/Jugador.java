@@ -3,18 +3,19 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package modelo;
-import estructuras.Cola;
+import estructuras.NodoPokemon;
+import estructuras.ColaTurnos;
 /**
  *
  * @author jimen
  */
 public class Jugador {
     private String nombre;
-    protected Cola pokedex;
+    protected ColaTurnos pokedex;
 
-    public Jugador(String nombre, Cola pokedex) {
+    public Jugador(String nombre, ColaTurnos pokedex) {
         this.nombre = nombre;
-        this.pokedex = new Cola();
+        this.pokedex = pokedex;
     }
 
     public String getNombre() {
@@ -22,13 +23,14 @@ public class Jugador {
     }
     private int contarRepetidos(String nombre){
         int contador=0;
-        Cola temporal = new Cola();
+        ColaTurnos temporal = new ColaTurnos();
         while(!pokedex.estaVacia()){
-            Pokemon actual = pokedex.desencolar();
+            NodoPokemon nodo = pokedex.desencolar();
+            Pokemon actual = nodo.pokemon;
             if(actual.getNombre().equals(nombre)){
                 contador++;
             }
-            temporal.encolar(actual);
+            temporal.encolar(nodo);
         }    
         while(!temporal.estaVacia()){
             pokedex.encolar(temporal.desencolar());
@@ -44,7 +46,7 @@ public class Jugador {
         return "No se permiten Pokemon repetidos.";
       
     }
-    pokedex.encolar(p);
+    pokedex.encolar(new NodoPokemon(p));
     return p.getNombre() + " fue agregado al equipo.";
         
     }
@@ -55,32 +57,38 @@ public class Jugador {
         if(contarRepetidos(p.getNombre())>=2){
             return; //maximo dos iguales 
         }
-        pokedex.encolar(p);
+        pokedex.encolar(new NodoPokemon(p));
     }
     
     
     public Pokemon getPokemonActivo(){
-        return pokedex.verFrente();
+        if(pokedex.verFrente()==null) return null;
+        return pokedex.verFrente().pokemon;
     }
     public boolean tienePokemonVivos(){
         return !pokedex.estaVacia();
     }
     public String pokemonDerrotado(){
-        Pokemon derrotado = pokedex.desencolar();
-        if(derrotado !=null){
+        NodoPokemon nodo = pokedex.desencolar();
+        if(nodo !=null){
+            Pokemon derrotado = nodo.pokemon;
+            if(pokedex.verFrente()!= null){
             return derrotado.getNombre() + " ha sido derrotado. Adelante " +
-                    pokedex.verFrente().getNombre(); 
+                    pokedex.verFrente().pokemon.getNombre(); 
+            
         } else {
             return derrotado.getNombre() + " ha sido derrotado. No quedan Pokemon.";
         }
-        
+            
+        }  
+        return "No hay Pokemon.";
     } 
     public String cambiarPokemon(){
         if(pokedex.getTamano()>1){
-            Pokemon actual = pokedex.verFrente();
+            Pokemon actual = pokedex.verFrente().pokemon;
             pokedex.cambiarPokemonActivo();
             return nombre+ "retira a "+actual.getNombre() +
-                    "Adelante "+pokedex.verFrente().getNombre();
+                    "Adelante "+pokedex.verFrente().pokemon.getNombre();
         } else {
            return "No hay otros Pokemon disponibles";
         }  
