@@ -13,6 +13,6 @@ import modelo.*;
 public class Snorlax extends PokemonNormal{
     
      public Snorlax() {
-        super("Pikachu");
+        super("Snorlax");
     }
 }
