@@ -1,0 +1,87 @@
+package Batallas;
+
+public class ListaEquipos {
+
+    private NodoEquipo cabeza;
+    private int tamano;
+
+    private class NodoEquipo {
+
+        String nombre;
+        boolean eliminado;
+        NodoEquipo siguiente;
+
+        NodoEquipo(String nombre) {
+            this.nombre = nombre;
+            this.eliminado = false;
+            this.siguiente = null;
+        }
+    }
+
+    public ListaEquipos() {
+        cabeza = null;
+        tamano = 0;
+    }
+
+    public void agregarEquipo(String nombre) {
+        NodoEquipo nuevo = new NodoEquipo(nombre);
+        if (cabeza == null) {
+            cabeza = nuevo;
+        } else {
+            NodoEquipo actual = cabeza;
+            while (actual.siguiente != null) {
+                actual = actual.siguiente;
+            }
+            actual.siguiente = nuevo;
+        }
+        tamano++;
+    }
+
+    public String getNombre(int indice) {
+        if (indice < 0 || indice >= tamano) {
+            return null;
+        }
+        NodoEquipo actual = cabeza;
+        for (int i = 0; i < indice; i++) {
+            actual = actual.siguiente;
+        }
+        return actual.nombre;
+    }
+
+    public void setNombre(int indice, String nombre) {
+        if (indice < 0 || indice >= tamano) {
+            return;
+        }
+        NodoEquipo actual = cabeza;
+        for (int i = 0; i < indice; i++) {
+            actual = actual.siguiente;
+        }
+        actual.nombre = nombre;
+    }
+
+    public boolean getEliminado(int indice) {
+        if (indice < 0 || indice >= tamano) {
+            return false;
+        }
+        NodoEquipo actual = cabeza;
+        for (int i = 0; i < indice; i++) {
+            actual = actual.siguiente;
+        }
+        return actual.eliminado;
+    }
+
+    public void setEliminado(int indice, boolean eliminado) {
+        if (indice < 0 || indice >= tamano) {
+            return;
+        }
+        NodoEquipo actual = cabeza;
+        for (int i = 0; i < indice; i++) {
+            actual = actual.siguiente;
+        }
+        actual.eliminado = eliminado;
+    }
+
+    public int getTamano() {
+        return tamano;
+    }
+}
