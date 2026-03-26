@@ -1,0 +1,73 @@
+package Batallas;
+
+public class ListaPokemon {
+
+    private NodoPokemon cabeza;
+
+    public ListaPokemon() {
+        cabeza = null;
+    }
+
+    public void agregarPokemon(Pokemon pokemon) {
+        NodoPokemon nuevo = new NodoPokemon(pokemon);
+        if (cabeza == null) {
+            cabeza = nuevo;
+        } else {
+            NodoPokemon actual = cabeza;
+            while (actual.siguiente != null) {
+                actual = actual.siguiente;
+            }
+            actual.siguiente = nuevo;
+        }
+    }
+
+    public boolean contienePokemon(String nombre) {
+        NodoPokemon actual = cabeza;
+        while (actual != null) {
+            if (actual.pokemon.getNombre().equals(nombre)) {
+                return true;
+            }
+            actual = actual.siguiente;
+        }
+        return false;
+    }
+
+    public int contarPokemons() {
+        int contador = 0;
+        NodoPokemon actual = cabeza;
+        while (actual != null) {
+            contador++;
+            actual = actual.siguiente;
+        }
+        return contador;
+    }
+
+    public NodoPokemon getCabeza() {
+        return cabeza;
+    }
+
+    public void eliminarPrimerPokemon() {
+        if (cabeza != null) {
+            cabeza = cabeza.siguiente;
+        }
+    }
+
+    public void eliminarPokemon(String nombre) {
+        if (cabeza == null) {
+            return;
+        }
+        if (cabeza.pokemon.getNombre().equals(nombre)) {
+            cabeza = cabeza.siguiente;
+            return;
+        }
+        NodoPokemon actual = cabeza;
+        while (actual.siguiente != null) {
+            if (actual.siguiente.pokemon.getNombre().equals(nombre)) {
+                actual.siguiente = actual.siguiente.siguiente;
+                return;
+            }
+            actual = actual.siguiente;
+        }
+    }
+
+}
