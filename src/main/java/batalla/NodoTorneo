@@ -1,0 +1,28 @@
+package Batallas;
+
+class NodoTorneo {
+
+    private ListaPokemon combate;
+    private NodoTorneo izquierda;
+    private NodoTorneo derecha;
+    private NodoTorneo siguiente;
+
+    public NodoTorneo(ListaPokemon combate) {
+        this.combate = combate;
+        this.izquierda = null;
+        this.derecha = null;
+        this.siguiente = null;
+    }
+
+    public ListaPokemon getCombateActual() {
+        return combate;
+    }
+
+    public NodoTorneo getSiguiente() {
+        return siguiente;
+    }
+
+    public void setSiguiente(NodoTorneo siguiente) {
+        this.siguiente = siguiente;
+    }
+}
