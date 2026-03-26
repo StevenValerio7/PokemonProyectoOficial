@@ -11,10 +11,13 @@ import modelo.Pokemon;
  *
  * @author jimen
  */
-//Lista para GUI
+
 public class ManejoBatalla {
     private Jugador jugador;
     private JugadorCPU cpu;
+    
+    private boolean jugadorDefendiendo = false;
+    private boolean cpuDefendiendo = false;
 
     public ManejoBatalla(Jugador jugador, JugadorCPU cpu) {
         this.jugador = jugador;
@@ -40,117 +43,149 @@ public class ManejoBatalla {
         
         String resultado = "";
         
-        if(opcion == 1){ //Ataque normal
-            double prob = Math.random();
-            if(prob<0.2){
-                resultado+= atacante.getNombre()+" fallo el ataque.\n";
-                
-            } else{
-                int danio = atacante.atacar(defensor);
-                defensor.recibirDa_io(danio);
-                resultado+= atacante.getNombre()+ 
-                        "atacó causando" + danio + " de daño.}n";
-            }
-        }
-        else if(opcion == 2){ //Ataque especial
-            if(atacante.getCooldownAtaqueEspecial()>0){
-                resultado += "Ataque especial en cooldown.\n";
-            } else{
-                double prob = Math.random();
-                
-                if(prob<0.2){
-                    resultado += atacante.getNombre() + "fallo el atque especial.\n";
-                }else{
-                    int danio = atacante.ataqueEspecial(defensor);
-                    defensor.recibirDa_io(danio);
-                    resultado+= atacante.getNombre() +
-                            "uso ataque especial causando "+ danio + " de dano.\n";
-                    atacante.setCooldownAtaqueEspecial(2);
-                }
-            }
-        }
-        else if(opcion == 3){//Defensa normal
-            resultado+= atacante.getNombre() + "se preparo para defender.\n";
+        if(atacante == null || defensor == null) return resultado;
             
+        switch(opcion){
+            case 1: //Ataque normal
+                if(Math.random()< 0.2){
+                    resultado += atacante.getNombre() + " falló el ataque.\n";    
+                } else {
+                    int danio = atacante.atacar(defensor);
+                
+                if(cpuDefendiendo){
+                    danio = defensor.defender(danio);
+                    cpuDefendiendo = false;
+                    resultado += "(CPU se defendió) ";
+                    
+                }
+                defensor.recibirDa_io(danio);
+                resultado += atacante.getNombre()+ " atacó causando "+ danio + " de daño.\n";
+        }
+        break;
+        case 2: //Ataque especial
+        if(atacante.getCooldownAtaqueEspecial() > 0){
+        resultado += "Ataque especial en cooldown.\n";
+        } else{
+        if(Math.random()<0.2){
+        resultado+=atacante.getNombre() + " falló el ataque especial.\n";
+        } else {
+            int danio = atacante.ataqueEspecial(defensor);
+            if(cpuDefendiendo){
+                    danio = defensor.defender(danio);
+                    cpuDefendiendo = false;
+                    resultado += "(CPU se defendió) "; 
+                }
+            defensor.recibirDa_io(danio);
+            resultado += atacante.getNombre()+ " atacó causando "+ danio + " de daño.\n";
+            atacante.setCooldownAtaqueEspecial(2);
         }
         
-        else if (opcion == 4){ // defensa especial
-            if(atacante.getCooldownDefensaEspecial()>0){
-                resultado += "Defensa especial en cooldown.\n";
-            }else{
-                resultado += atacante.getNombre()+" activo defensa especial.\n";
-                atacante.setCooldownDefensaEspecial(2);
-            }
+    }
+    break;
+    case 3: //Defensa
+        jugadorDefendiendo = true;
+        resultado+=atacante.getNombre() + " se está defendiendo.\n";
+        break;
+    case 4: //Defensa especial
+        if(atacante.getCooldownDefensaEspecial()>0){
+            resultado += "Defensa especial en cooldown.\n";
+        } else {
+            jugadorDefendiendo = true;
+            resultado += atacante.getNombre() + " activó defensa especial.\n";
+            atacante.setCooldownDefensaEspecial(2);
         }
-        else if(opcion == 5){ //Cambiar Pokemon
-            resultado+= jugador.cambiarPokemon();
+        break;
+        
+    case 5: //Cambiar 
+        resultado+= jugador.cambiarPokemon();
+        break;
+        
         }
-        //Verificar si defensor murio
         if(!defensor.estaVivo()){
             cpu.pokemonDerrotado();
-            resultado += defensor.getNombre() + " fue derrotado.\n";
-            
+            resultado+= defensor.getNombre() + " fue derrotado.\n";
         }
         reducirCooldowns(atacante);
         return resultado;
-    }
-    
-    //Turno auto de la CPU
-    public String turnoCPU(){
-    Pokemon atacante = cpu.getPokemonActivo();
-    Pokemon defensor = jugador.getPokemonActivo();
-    
-    String resultado = "";
-    
-    int opcion = (int)(Math.random()* 2)+ 1; // esto es 1 o 2
-    
-    if(opcion == 1){
-        int danio = atacante.atacar(defensor);
-        defensor.recibirDa_io(danio);
         
-        resultado += atacante.getNombre() +
-                " ataco a "+ defensor.getNombre() +
-                " causando "+ danio + "de dano.\n";
-    } else {
-        if(atacante.getCooldownAtaqueEspecial() == 0){
-            int danio = atacante.ataqueEspecial(defensor);
-            defensor.recibirDa_io(danio);
-            
-            resultado += atacante.getNombre() +
-                    "uso ataque especial causando " + danio +
-                    "de dano.\n";
-            atacante.setCooldownAtaqueEspecial(2);
-        }else{
-            resultado += atacante.getNombre() + "no pudo usar ataque especial";
+ } 
+    public String turnoCPU(){
+        Pokemon atacante = cpu.getPokemonActivo();
+        Pokemon defensor = jugador.getPokemonActivo();
+        
+        String resultado = "";
+        if(atacante == null || defensor == null) return resultado;
+        int opcion = (int)(Math.random()*3)+1;
+        
+        switch(opcion){
+            case 1: //Ataque normal
+                if(Math.random()< 0.2){
+                    resultado += atacante.getNombre() + " falló el ataque.\n";    
+                } else {
+                    int danio = atacante.atacar(defensor);
+                
+                if(jugadorDefendiendo){
+                    danio = defensor.defender(danio);
+                    jugadorDefendiendo = false;
+                    resultado += "(Jugador se defendió) ";
+                    
+                }
+                defensor.recibirDa_io(danio);
+                resultado += atacante.getNombre()+ " atacó causando "+ danio + " de daño.\n";
         }
+        break;
+           case 2:
+        if(atacante.getCooldownAtaqueEspecial()==0){
+        if(Math.random()<0.2){
+        resultado +=atacante.getNombre()+" falló el ataque especial.\n";
+        
+    } else {
+            int danio = atacante.ataqueEspecial(defensor);
+            if(jugadorDefendiendo){
+                danio = defensor.defender(danio);
+                jugadorDefendiendo = false;
+                resultado += "(Jugador se defendió) ";
+            }
+            defensor.recibirDa_io(danio);
+            resultado +=atacante.getNombre() + " usó ataque especial causando "+danio+" de daño\n";
+            atacante.setCooldownAtaqueEspecial(2);
+        } 
+        } else {
+          resultado += atacante.getNombre() + " no pudo usar ataque especial.\n";
+        }
+        break;
+           case 3: 
+               cpuDefendiendo = true;
+               resultado += atacante.getNombre() + " se esta defendiendo.\n";
+               break;
     }
-    //Verificar si el denfensor murio
-    if(!defensor.estaVivo()){
-        jugador.pokemonDerrotado();
-        resultado += defensor.getNombre() + " fue derrotado.\n";
-    }
+        if(!defensor.estaVivo()){
+            cpu.pokemonDerrotado();
+            resultado+= defensor.getNombre() + " fue derrotado.\n";
+        }
         reducirCooldowns(atacante);
         return resultado;
-}
-    //Verificar si la batalla termino
+    }
     public boolean batallaTerminado(){
         return !jugador.tienePokemonVivos() || !cpu.tienePokemonVivos();
+        
     }
-    
-    //Obtener ganador
     public String obtenerGanador(){
         if(jugador.tienePokemonVivos()){
             return jugador.getNombre();
-        } else{
+        } else {
             return cpu.getNombre();
         }
     }
-    // Getters para la GUI
     public Pokemon getPokemonJugador(){
         return jugador.getPokemonActivo();
     }
     public Pokemon getPokemonCPU(){
         return cpu.getPokemonActivo();
     }
-   
 }
+        
+           
+   
+
+
