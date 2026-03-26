@@ -1,0 +1,50 @@
+package Batallas;
+
+public class ColaTurnos {
+
+    private Nodo frente;
+    private Nodo fin;
+
+    public ColaTurnos() {
+        frente = null;
+        fin = null;
+    }
+
+    private static class Nodo {
+
+        NodoPokemon nodoPokemon;
+        Nodo siguiente;
+
+        Nodo(NodoPokemon nodoPokemon) {
+            this.nodoPokemon = nodoPokemon;
+            this.siguiente = null;
+        }
+    }
+
+    public void encolar(NodoPokemon nodoPokemon) {
+        Nodo nuevo = new Nodo(nodoPokemon);
+        if (frente == null) {
+            frente = nuevo;
+            fin = nuevo;
+        } else {
+            fin.siguiente = nuevo;
+            fin = nuevo;
+        }
+    }
+
+    public NodoPokemon desencolar() {
+        if (frente == null) {
+            return null;
+        }
+        NodoPokemon nodoPokemon = frente.nodoPokemon;
+        frente = frente.siguiente;
+        if (frente == null) {
+            fin = null;
+        }
+        return nodoPokemon;
+    }
+
+    public boolean estaVacia() {
+        return frente == null;
+    }
+}
