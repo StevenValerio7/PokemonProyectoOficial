@@ -31,8 +31,7 @@ public class PantallaBienvenida extends javax.swing.JFrame {
             clip.close();
         }
     }
-
-     private void reproducirMusica(String archivo, boolean loop){
+      private void reproducirMusica(String archivo, boolean loop){
         try{
             AudioInputStream audio = AudioSystem.getAudioInputStream(getClass().getResource("/sonido/"+archivo));
             clip = AudioSystem.getClip();
@@ -45,6 +44,8 @@ public class PantallaBienvenida extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.
