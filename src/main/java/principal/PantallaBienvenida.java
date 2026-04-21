@@ -7,7 +7,7 @@ package principal;
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
-import gui.SeleccionPokemonGUI;
+
 
 public class PantallaBienvenida extends javax.swing.JFrame {
 
@@ -101,8 +101,9 @@ public class PantallaBienvenida extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         detenerMusica(); // Detener la música antes de cambiar de pantalla
-        SeleccionPokemonGUI seleccion = new SeleccionPokemonGUI();
-        seleccion.setVisible(true);
+        BarraProgreso progreso = new BarraProgreso();
+        progreso.setVisible(true);
+        progreso.iniciarCarga();
         dispose(); // Cerrar la pantalla actual
     }//GEN-LAST:event_jButton1ActionPerformed
 
