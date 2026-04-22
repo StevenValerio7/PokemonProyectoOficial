@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package gui;
 import Pokemones.*;
 import modelo.*;
@@ -12,10 +8,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.sound.sampled.*;
-/**
- *
- * @author jimen
- */
 public class SeleccionPokemonGUI extends JFrame {
     private int cantidadSeleccionada = 0;
     private Jugador jugador;
@@ -34,7 +26,7 @@ public class SeleccionPokemonGUI extends JFrame {
     private String nombreSeleccion4;
 
     private Clip clip;
-    
+
     private static class NodoBoton {
         String nombre;
         JButton boton;
@@ -372,23 +364,17 @@ public class SeleccionPokemonGUI extends JFrame {
         jugador.setNombre(nombreJugador);
         if(cantidadSeleccionada == 4){
             detenerMusica();
-            //CPU vacio
             JugadorCPU cpu = new JugadorCPU("CPU", new ColaTurnos());
-            
-            //Crear torneo
-            ArbolTorneo torneo = new ArbolTorneo();
-            
-            //Obtener primer equipo del torneo 
+
+            ArbolTorneo torneo = new ArbolTorneo(jugador.getNombre());
             ListaPokemon equipoCPU = torneo.getEquipoActualCPU();
-            
-            //Pokemones a CPU
+
             NodoPokemon actual = equipoCPU.getCabeza();
             while(actual != null){
                 cpu.agregarPokemonCPU(actual.pokemon);
                 actual = actual.siguiente;
             }
-            // Crear combate 
-            Combate combate = new Combate(jugador,cpu);
+            Combate combate = new Combate(jugador, cpu, torneo);
             combate.setVisible(true);
             dispose();
             
@@ -417,7 +403,9 @@ public class SeleccionPokemonGUI extends JFrame {
             clip.close();
         }
     }
-    
- 
+
 }
+
+
+
 
