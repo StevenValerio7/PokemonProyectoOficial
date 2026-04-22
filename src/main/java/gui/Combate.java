@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package gui;
 import estructuras.ArbolTorneo;
 import estructuras.ColaTurnos;
@@ -19,18 +15,22 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -45,10 +45,6 @@ import modelo.Jugador;
 import modelo.JugadorCPU;
 import batalla.ManejoBatalla;
 import modelo.Pokemon;
-/**
- *
- * @author jimen
- */
 public class Combate extends JFrame {
 
     private ListaPokemon equipoCPU;
@@ -71,6 +67,8 @@ public class Combate extends JFrame {
     private JPanel panelCombate;
     private JPanel panelBracket;
     private JPanel panelEquipoVivo;
+    private JPanel panelBotones;
+    private JScrollPane scrollLog;
     private FondoPanel fondo;
     private JLabel lblNombreJugador;
     private JLabel lblNombreCPU;
@@ -81,20 +79,45 @@ public class Combate extends JFrame {
     private boolean batallaIniciada;
 
     private Clip clip;
+    private ImageIcon escudoNormalIcon;
+    private ImageIcon escudoEspecialIcon;
 
-    private final Map<Pokemon, Integer> hpMaximos = new HashMap<>();
+    private static class SeleccionPokemon {
+        String nombre;
+        boolean confirmada;
+    }
+
+    private static class Contador {
+        int valor;
+    }
+
+    private static final int BASE_WIDTH = 1200;
+    private static final int BASE_HEIGHT = 600;
 
     public Combate(Jugador jugador, JugadorCPU cpu) {
     this.jugadorBatalla = jugador;
     this.cpuBatalla = cpu;
     this.manejoBatalla = new ManejoBatalla(jugadorBatalla, cpuBatalla);
 
-    this.torneo = new ArbolTorneo();
+    this.torneo = new ArbolTorneo(jugadorBatalla.getNombre());
     this.batallaIniciada = false;
     this.puedeActuar = false;
     
 
     initComponents();    
+    torneo.limpiarGanador();
+    if (btnContinuar != null) {
+        btnContinuar.setEnabled(true);
+        btnContinuar.setText("Continuar");
+    }
+    addComponentListener(new ComponentAdapter() {
+        @Override
+        public void componentResized(ComponentEvent e) {
+            ajustarLayout();
+        }
+    });
+    ajustarLayout();
+    mostrarBracket(true);
     actualizarVistaCombate();
     actualizarEquipoVivo();
 
@@ -104,7 +127,36 @@ public class Combate extends JFrame {
     setLocationRelativeTo(null);
 }
 
-   
+    public Combate(Jugador jugador, JugadorCPU cpu, ArbolTorneo torneo) {
+        this.jugadorBatalla = jugador;
+        this.cpuBatalla = cpu;
+        this.manejoBatalla = new ManejoBatalla(jugadorBatalla, cpuBatalla);
+        this.torneo = torneo != null ? torneo : new ArbolTorneo(jugadorBatalla.getNombre());
+        this.batallaIniciada = false;
+        this.puedeActuar = false;
+
+        initComponents();
+        this.torneo.limpiarGanador();
+        if (btnContinuar != null) {
+            btnContinuar.setEnabled(true);
+            btnContinuar.setText("Continuar");
+        }
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                ajustarLayout();
+            }
+        });
+        ajustarLayout();
+        mostrarBracket(true);
+        actualizarVistaCombate();
+        actualizarEquipoVivo();
+
+        setTitle("Combate Pok\u00E9mon");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(1200, 600);
+        setLocationRelativeTo(null);
+    }
 
     private ColaTurnos convertirListaACola(ListaPokemon lista) {
         ColaTurnos cola = new ColaTurnos();
@@ -122,25 +174,12 @@ public class Combate extends JFrame {
         return cola;
     }
 
-    private void registrarHpMaximos(ListaPokemon lista) {
-        if (lista == null) {
-            return;
-        }
-
-        int i = 0;
-        Pokemon actual = lista.obtener(i);
-        while (actual != null) {
-            hpMaximos.putIfAbsent(actual, actual.getHp());
-            i++;
-            actual = lista.obtener(i);
-        }
-    }
-
     private int obtenerHpMaximo(Pokemon pokemon) {
         if (pokemon == null) {
             return 1;
         }
-        return hpMaximos.getOrDefault(pokemon, pokemon.getHp());
+        int maximo = pokemon.getHpMaximo();
+        return maximo > 0 ? maximo : pokemon.getHp();
     }
 
     private void initComponents() {
@@ -148,13 +187,14 @@ public class Combate extends JFrame {
         fondo.setLayout(null);
         setContentPane(fondo);
 
-        panelBracket = new JPanel(new BorderLayout());
+        panelBracket = new JPanel(null);
         panelBracket.setOpaque(false);
         panelBracket.setBounds(0, 0, 1200, 600);
 
         bracketPanel = new BracketPanel(torneo);
         bracketPanel.setOpaque(false);
-        panelBracket.add(bracketPanel, BorderLayout.CENTER);
+        bracketPanel.setBounds(0, 0, 1200, 600);
+        panelBracket.add(bracketPanel);
         fondo.add(panelBracket);
 
         btnContinuar = new JButton("Continuar");
@@ -243,7 +283,10 @@ public class Combate extends JFrame {
         lblEscudoCPU.setBounds(1032, 330, 20, 20);
         panelCombate.add(lblEscudoCPU);
 
-        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        escudoNormalIcon = cargarIcono("/pokemonproyecto/img/defensa.png", 18, 18);
+        escudoEspecialIcon = cargarIcono("/pokemonproyecto/img/defensaespecial.png", 18, 18);
+
+        panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         panelBotones.setOpaque(false);
         panelBotones.setBounds(0, 450, 1200, 100);
         panelCombate.add(panelBotones);
@@ -300,7 +343,7 @@ public class Combate extends JFrame {
         SimpleAttributeSet center = new SimpleAttributeSet();
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
         txtLog.setParagraphAttributes(center, true);
-        JScrollPane scrollLog = new JScrollPane(txtLog);
+        scrollLog = new JScrollPane(txtLog);
         scrollLog.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollLog.setBounds(0, 0, 1200, 100);
         panelCombate.add(scrollLog);
@@ -358,11 +401,70 @@ public class Combate extends JFrame {
 
         reproducirMusica("combate.wav", true);
         actualizarVistaCombate();
-        habilitarBotones(true);
+        actualizarEquipoVivo();
         
     }
 
-    private void mostrarBracket() {
+    private void ajustarLayout() {
+        int w = getContentPane().getWidth();
+        int h = getContentPane().getHeight();
+        if (w <= 0 || h <= 0) {
+            return;
+        }
+
+        if (panelBracket != null) {
+            panelBracket.setBounds(0, 0, w, h);
+        }
+        if (bracketPanel != null) {
+            bracketPanel.setBounds(0, 0, w, h);
+        }
+        if (panelCombate != null) {
+            panelCombate.setBounds(0, 0, w, h);
+        }
+
+        double scale = Math.min(w / (double) BASE_WIDTH, h / (double) BASE_HEIGHT);
+        int offsetX = (int) Math.round((w - (BASE_WIDTH * scale)) / 2.0);
+        int offsetY = (int) Math.round((h - (BASE_HEIGHT * scale)) / 2.0);
+
+        setScaledBounds(btnContinuar, 540, 500, 120, 40, scale, offsetX, offsetY);
+
+        setScaledBounds(lblTitulo, 500, 100, 200, 20, scale, offsetX, offsetY);
+        setScaledBounds(lblPokemonJugador, 100, 150, 132, 132, scale, offsetX, offsetY);
+        setScaledBounds(pbVidaJugador, 100, 300, 132, 20, scale, offsetX, offsetY);
+        setScaledBounds(lblNombreJugador, 100, 330, 132, 20, scale, offsetX, offsetY);
+        setScaledBounds(lblEscudoJugador, 232, 330, 20, 20, scale, offsetX, offsetY);
+
+        setScaledBounds(lblPokemonCPU, 900, 150, 132, 132, scale, offsetX, offsetY);
+        setScaledBounds(pbVidaCPU, 900, 300, 132, 20, scale, offsetX, offsetY);
+        setScaledBounds(lblNombreCPU, 900, 330, 132, 20, scale, offsetX, offsetY);
+        setScaledBounds(lblEscudoCPU, 1032, 330, 20, 20, scale, offsetX, offsetY);
+
+        setScaledBounds(panelBotones, 0, 450, 1200, 100, scale, offsetX, offsetY);
+        setScaledBounds(panelEquipoVivo, 1000, 450, 150, 100, scale, offsetX, offsetY);
+        setScaledBounds(scrollLog, 0, 0, 1200, 100, scale, offsetX, offsetY);
+
+        if (panelBracket != null) {
+            panelBracket.revalidate();
+            panelBracket.repaint();
+        }
+        if (bracketPanel != null) {
+            bracketPanel.revalidate();
+            bracketPanel.repaint();
+        }
+    }
+
+    private void setScaledBounds(JComponent comp, int x, int y, int w, int h, double scale, int offsetX, int offsetY) {
+        if (comp == null) {
+            return;
+        }
+        int nx = (int) Math.round(x * scale) + offsetX;
+        int ny = (int) Math.round(y * scale) + offsetY;
+        int nw = (int) Math.round(w * scale);
+        int nh = (int) Math.round(h * scale);
+        comp.setBounds(nx, ny, nw, nh);
+    }
+
+    private void mostrarBracket(boolean reproducirSonido) {
         batallaIniciada = false;
         puedeActuar = false;
         habilitarBotones(false);
@@ -370,6 +472,10 @@ public class Combate extends JFrame {
         panelCombate.setVisible(false);
         panelBracket.setVisible(true);
         btnContinuar.setVisible(true);
+        if (!torneo.isTorneoTerminado()) {
+            btnContinuar.setEnabled(true);
+            btnContinuar.setText("Continuar");
+        }
 
         fondo.setImagen("torneo.jpg");
         bracketPanel.repaint();
@@ -377,6 +483,9 @@ public class Combate extends JFrame {
         fondo.repaint();
 
         detenerMusica();
+        if (reproducirSonido) {
+            reproducirMusica("bienvenida.wav", true);
+        }
     }
 
     private void realizarAccion(String accion) {
@@ -384,6 +493,14 @@ public class Combate extends JFrame {
             return;
         }
 
+        if ("cambiar".equals(accion)) {
+            puedeActuar = false;
+            habilitarBotones(false);
+            manejarCambioPokemon();
+            return;
+        }
+
+        puedeActuar = false;
         habilitarBotones(false);
 
         int opcion;
@@ -409,6 +526,7 @@ public class Combate extends JFrame {
 
         String resultado = manejoBatalla.turnoJugador(opcion);
         appendLog(resultado);
+        ejecutarAnimacionPorAccion(true, manejoBatalla.getUltimaAccionJugador());
         actualizarVistaCombate();
         if(manejoBatalla.batallaTerminado()){
             finalizarBatalla();
@@ -427,17 +545,35 @@ public class Combate extends JFrame {
         
         String resultado = manejoBatalla.turnoCPU();
         appendLog(resultado);
+        ejecutarAnimacionPorAccion(false, manejoBatalla.getUltimaAccionCPU());
         actualizarVistaCombate();
         if(manejoBatalla.batallaTerminado()){
             finalizarBatalla();
             return;
         }
         puedeActuar = true;
-        habilitarBotones(true);
+        actualizarVistaCombate();
         appendLog("Turno del jugador\n");
     }
 
     private void finalizarBatalla() {
+        if (!jugadorBatalla.tienePokemonVivos()) {
+            detenerMusica();
+            torneo.finalizarTorneoPorDerrota(cpuBatalla.getNombre());
+            mostrarBracket(false);
+            btnContinuar.setEnabled(false);
+            btnContinuar.setText("Torneo finalizado");
+            bracketPanel.repaint();
+            PantallaDerrota derrota = new PantallaDerrota(torneo.getGanadorFinal());
+            derrota.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    reproducirMusica("bienvenida.wav", true);
+                }
+            });
+            derrota.setVisible(true);
+            return;
+        }
         String ganador = manejoBatalla.obtenerGanador();
     //mostrar resultado en el log
     appendLog("\n==============================\n");
@@ -447,8 +583,9 @@ public class Combate extends JFrame {
 
     //avanzar torneo
     NodoTorneo siguiente = torneo.getSiguienteCombate();
+    boolean torneoFinalizado = (siguiente == null);
 
-    if (siguiente != null) {
+    if (!torneoFinalizado) {
 
         ListaPokemon nuevoEquipoCPU = torneo.getEquipoActualCPU();
 
@@ -471,25 +608,40 @@ public class Combate extends JFrame {
             appendLog("Presiona 'Continuar' para seguir.\n");
 
             // volver al bracket
-            mostrarBracket();
+            mostrarBracket(false);
 
         } else {
             appendLog("Error: no se pudo cargar el siguiente combate.\n");
         }
 
-    }  if (siguiente == null){
+    }  if (torneoFinalizado){
         //  torneo terminado
         
     String ganadorFinal = manejoBatalla.obtenerGanador();
     appendLog("¡TORNEO FINALIZADO! Ganador: " + ganadorFinal + "\n");
     torneo.setGanadorFinal(ganadorFinal); // método sencillo en ArbolTorneo
-    mostrarBracket();
+    mostrarBracket(false);
     btnContinuar.setEnabled(false);
     btnContinuar.setText("Torneo finalizado");  
     }
 
     // refrescar vista del bracket
     bracketPanel.repaint();
+
+    detenerMusica();
+    PantallaVictoria victoria;
+    if (torneoFinalizado) {
+        victoria = new PantallaVictoria("Has ganado el torneo", "Eres el Maestro Pokemon");
+    } else {
+        victoria = new PantallaVictoria("Has ganado la batalla", null);
+    }
+    victoria.addWindowListener(new WindowAdapter() {
+        @Override
+        public void windowClosed(WindowEvent e) {
+            reproducirMusica("bienvenida.wav", true);
+        }
+    });
+    victoria.setVisible(true);
  
     }
 
@@ -541,6 +693,8 @@ public class Combate extends JFrame {
                 && pokemonJugador.getCooldownDefensaEspecial() == 0
         );
 
+        actualizarEscudos();
+        actualizarEquipoVivo();
         panelCombate.revalidate();
         panelCombate.repaint();
     }
@@ -553,26 +707,172 @@ public class Combate extends JFrame {
     }
 
     private ImageIcon cargarImagenPokemon(String nombrePokemon) {
+        return cargarImagenPokemon(nombrePokemon, 132, 132);
+    }
+
+    private ImageIcon cargarImagenPokemon(String nombrePokemon, int ancho, int alto) {
         String ruta = "/pokemonproyecto/img/" + nombrePokemon.toLowerCase() + ".png";
         java.net.URL url = getClass().getResource(ruta);
         if(url == null){
-            System.out.println("No se encontró la imagen: "+ ruta);
-            BufferedImage img = new BufferedImage(132,132,BufferedImage.TYPE_INT_ARGB);
+            BufferedImage img = new BufferedImage(ancho, alto, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = img.createGraphics();
             g2d.setColor(new Color(30,30,30,180));
-            g2d.fillRoundRect(0, 0, 132, 132, 20, 20);
+            g2d.fillRoundRect(0, 0, ancho, alto, 20, 20);
             g2d.setColor(Color.WHITE);
             g2d.setFont(new Font("SansSerif",Font.BOLD,12));
-            g2d.drawString(nombrePokemon, 10, 66);
+            g2d.drawString(nombrePokemon, 10, alto / 2);
             g2d.dispose();
             return new ImageIcon(img);
-            
         }
         ImageIcon icon = new ImageIcon(url);
-        Image imagenEscalada = icon.getImage().getScaledInstance(132, 132, Image.SCALE_SMOOTH);
+        Image imagenEscalada = icon.getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
         return new ImageIcon(imagenEscalada);
+    }
 
-        
+    private ImageIcon cargarIcono(String ruta, int ancho, int alto) {
+        java.net.URL url = getClass().getResource(ruta);
+        if (url == null) {
+            return null;
+        }
+        ImageIcon icono = new ImageIcon(url);
+        Image imagenEscalada = icono.getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
+        return new ImageIcon(imagenEscalada);
+    }
+
+    private void actualizarEscudos() {
+        if (manejoBatalla.isJugadorDefendiendoEspecial()) {
+            lblEscudoJugador.setIcon(escudoEspecialIcon);
+        } else if (manejoBatalla.isJugadorDefendiendo()) {
+            lblEscudoJugador.setIcon(escudoNormalIcon);
+        } else {
+            lblEscudoJugador.setIcon(null);
+        }
+
+        if (manejoBatalla.isCpuDefendiendoEspecial()) {
+            lblEscudoCPU.setIcon(escudoEspecialIcon);
+        } else if (manejoBatalla.isCpuDefendiendo()) {
+            lblEscudoCPU.setIcon(escudoNormalIcon);
+        } else {
+            lblEscudoCPU.setIcon(null);
+        }
+    }
+
+    private void ejecutarAnimacionPorAccion(boolean esJugador, int accion) {
+        FadeLabel atacante = esJugador ? lblPokemonJugador : lblPokemonCPU;
+        FadeLabel defensor = esJugador ? lblPokemonCPU : lblPokemonJugador;
+        int desplazamiento = esJugador ? 40 : -40;
+        if (accion == 1) {
+            animarAtaque(atacante, defensor, desplazamiento, new Color(255, 69, 0));
+        } else if (accion == 2) {
+            animarAtaque(atacante, defensor, desplazamiento, new Color(255, 140, 0));
+        }
+    }
+
+    private void animarAtaque(FadeLabel atacante, FadeLabel defensor, int desplazamiento, Color colorEfecto) {
+        if (atacante == null || defensor == null) {
+            return;
+        }
+        int xInicial = atacante.getX();
+        int pasos = 10;
+        final Contador paso = new Contador();
+
+        Timer timer = new Timer(25, null);
+        timer.addActionListener(e -> {
+            int mitad = pasos / 2;
+            if (paso.valor < mitad) {
+                atacante.setLocation(xInicial + (desplazamiento * (paso.valor + 1)) / mitad, atacante.getY());
+            } else if (paso.valor == mitad) {
+                aplicarEfectoImpacto(defensor, colorEfecto);
+            } else if (paso.valor < pasos) {
+                int retroceso = pasos - paso.valor;
+                atacante.setLocation(xInicial + (desplazamiento * retroceso) / mitad, atacante.getY());
+            }
+            paso.valor++;
+            if (paso.valor >= pasos) {
+                atacante.setLocation(xInicial, atacante.getY());
+                timer.stop();
+            }
+        });
+        timer.start();
+    }
+
+    private void aplicarEfectoImpacto(JLabel defensor, Color color) {
+        if (defensor == null) {
+            return;
+        }
+        defensor.setBorder(BorderFactory.createLineBorder(color, 3));
+        Timer t = new Timer(150, e -> {
+            defensor.setBorder(null);
+            ((Timer) e.getSource()).stop();
+        });
+        t.setRepeats(false);
+        t.start();
+    }
+
+    private void manejarCambioPokemon() {
+        String seleccionado = mostrarSelectorPokemon();
+        if (seleccionado == null) {
+            puedeActuar = true;
+            habilitarBotones(true);
+            return;
+        }
+
+        String resultado = manejoBatalla.cambiarPokemonJugador(seleccionado);
+        appendLog(resultado);
+        actualizarVistaCombate();
+        if (manejoBatalla.batallaTerminado()) {
+            finalizarBatalla();
+            return;
+        }
+
+        Timer t = new Timer(800, e -> {
+            ((Timer) e.getSource()).stop();
+            turnoCPU();
+        });
+        t.setRepeats(false);
+        t.start();
+    }
+
+    private String mostrarSelectorPokemon() {
+        SeleccionPokemon seleccion = new SeleccionPokemon();
+        JDialog dialogo = new JDialog(this, "Elige tu Pokémon", true);
+        dialogo.setLayout(new BorderLayout());
+
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        ListaPokemon equipo = jugadorBatalla.obtenerEquipo();
+        int i = 0;
+        Pokemon actual = equipo.obtener(i);
+        Pokemon activo = manejoBatalla.getPokemonJugador();
+        while (actual != null) {
+            Pokemon pokemonBtn = actual;
+            JButton btn = new JButton(pokemonBtn.getNombre());
+            btn.setIcon(cargarImagenPokemon(pokemonBtn.getNombre(), 60, 60));
+            if (activo != null && pokemonBtn.getNombre().equals(activo.getNombre())) {
+                btn.setEnabled(false);
+                btn.setText(pokemonBtn.getNombre() + " (Activo)");
+            }
+            btn.addActionListener(e -> {
+                seleccion.nombre = pokemonBtn.getNombre();
+                seleccion.confirmada = true;
+                dialogo.dispose();
+            });
+            panel.add(btn);
+            i++;
+            actual = equipo.obtener(i);
+        }
+
+        JPanel panelBotones = new JPanel();
+        JButton btnCancelar = new JButton("Cancelar");
+        btnCancelar.addActionListener(e -> dialogo.dispose());
+        panelBotones.add(btnCancelar);
+
+        dialogo.add(panel, BorderLayout.CENTER);
+        dialogo.add(panelBotones, BorderLayout.SOUTH);
+        dialogo.pack();
+        dialogo.setLocationRelativeTo(this);
+        dialogo.setVisible(true);
+
+        return seleccion.confirmada ? seleccion.nombre : null;
     }
 
     private void actualizarEquipoVivo() {
@@ -625,9 +925,8 @@ public class Combate extends JFrame {
     private void reproducirMusica(String archivo, boolean loop) {
         try {
             detenerMusica();
-            java.net.URL url = getClass().getResource("/pokemonproyecto/audio/"+ archivo);
+            java.net.URL url = getClass().getResource("/sonido/"+ archivo);
             if(url == null){
-                System.out.println("No se encontro audio: "+ archivo);
                 return;
             }
             clip = AudioSystem.getClip();
@@ -638,7 +937,6 @@ public class Combate extends JFrame {
                 clip.start();
             }
         } catch (Exception e) {
-            System.err.println("No se pudo reproducir el audio: " + archivo);
         }
     }
 
@@ -649,7 +947,6 @@ public class Combate extends JFrame {
                 clip.close();
             }
         } catch (Exception e) {
-            System.err.println("No se pudo detener el audio.");
         }
     }
 
@@ -661,13 +958,21 @@ public class Combate extends JFrame {
             super.paintComponent(g);
             try {
                 BufferedImage image = ImageIO.read(getClass().getResource("/pokemonproyecto/img/" + imagenActual));
-                Image scaledImage = image.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
+                int panelW = getWidth();
+                int panelH = getHeight();
+                int imgW = image.getWidth();
+                int imgH = image.getHeight();
+                double scale = Math.max(panelW / (double) imgW, panelH / (double) imgH);
+                int drawW = (int) Math.round(imgW * scale);
+                int drawH = (int) Math.round(imgH * scale);
+                int x = (panelW - drawW) / 2;
+                int y = (panelH - drawH) / 2;
+                Image scaledImage = image.getScaledInstance(drawW, drawH, Image.SCALE_SMOOTH);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
-                g2d.drawImage(scaledImage, 0, 0, null);
+                g2d.drawImage(scaledImage, x, y, null);
                 g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
             } catch (IOException e) {
-                System.err.println("Error al cargar la imagen: " + imagenActual);
             }
         }
 
@@ -699,3 +1004,4 @@ public class Combate extends JFrame {
     }
 
 }
+

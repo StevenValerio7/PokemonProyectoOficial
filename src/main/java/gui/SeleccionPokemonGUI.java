@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package gui;
 import Pokemones.*;
 import modelo.*;
@@ -12,21 +8,17 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.sound.sampled.*;
-import java.io.File;
-import java.io.IOException;
-/**
- *
- * @author jimen
- */
 public class SeleccionPokemonGUI extends JFrame {
     private int cantidadSeleccionada = 0;
     private Jugador jugador;
+    private NodoBoton botones;
 
     private JLabel lblMensaje;
     private JLabel seleccion1;
     private JLabel seleccion2;
     private JLabel seleccion3;
     private JLabel seleccion4;
+    private JTextField txtNombre;
 
     private String nombreSeleccion1;
     private String nombreSeleccion2;
@@ -34,19 +26,29 @@ public class SeleccionPokemonGUI extends JFrame {
     private String nombreSeleccion4;
 
     private Clip clip;
+
+    private static class NodoBoton {
+        String nombre;
+        JButton boton;
+        NodoBoton siguiente;
+
+        NodoBoton(String nombre, JButton boton) {
+            this.nombre = nombre;
+            this.boton = boton;
+            this.siguiente = null;
+        }
+    }
     
     private ImageIcon cargarImagen(String ruta, int ancho, int alto){
         try{
             java.net.URL url = getClass().getResource(ruta);
             if(url == null){
-                System.out.println("No se encontro: "+ ruta);
                 return null;
             }
             ImageIcon icon = new ImageIcon(url);
             Image img = icon.getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
             return new ImageIcon(img);
         } catch (Exception e){
-            e.printStackTrace();
             return null;
         }
     }
@@ -66,7 +68,6 @@ public class SeleccionPokemonGUI extends JFrame {
     }
 
     private void initComponents() {
-        System.out.println(getClass().getResource("/pokemonproyecto/img/snorlax.png"));
         setLayout(new BorderLayout());
         //Fondo 
         
@@ -80,7 +81,21 @@ public class SeleccionPokemonGUI extends JFrame {
         JLabel lblTitulo = new JLabel("Selecciona 4 Pokémon:", SwingConstants.CENTER);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 24));
         lblTitulo.setForeground(Color.WHITE);
-        fondo.add(lblTitulo, BorderLayout.NORTH);
+
+        JPanel panelNombre = new JPanel();
+        panelNombre.setOpaque(false);
+        JLabel lblNombre = new JLabel("Tu nombre:");
+        lblNombre.setFont(new Font("Arial", Font.BOLD, 14));
+        lblNombre.setForeground(Color.WHITE);
+        txtNombre = new JTextField(12);
+        panelNombre.add(lblNombre);
+        panelNombre.add(txtNombre);
+
+        JPanel panelTitulo = new JPanel(new GridLayout(2,1));
+        panelTitulo.setOpaque(false);
+        panelTitulo.add(lblTitulo);
+        panelTitulo.add(panelNombre);
+        fondo.add(panelTitulo, BorderLayout.NORTH);
         
         //Panel central 
         JPanel panelCentral = new JPanel(new GridLayout(3,3,5,5));
@@ -88,10 +103,11 @@ public class SeleccionPokemonGUI extends JFrame {
         panelCentral.setPreferredSize(new Dimension(400,400));
         
         // Botones de Pokémon
-        String[] nombres = {"Snorlax","Meowth","Pidgey","Charmander","Growlithe","Magmar","Squirtle","Psyduck","Poliwag"};
-
+        ListaPokemon catalogo = crearCatalogo();
         int index = 0;
-        for(String nombre : nombres){
+        Pokemon actual = catalogo.obtener(index);
+        while(actual != null){
+            String nombre = actual.getNombre();
 
             JButton btnPokemon = new JButton(nombre);
             btnPokemon.setIcon(cargarImagen("/pokemonproyecto/img/" + nombre.toLowerCase() + ".png", 80,80));
@@ -102,12 +118,15 @@ public class SeleccionPokemonGUI extends JFrame {
             btnPokemon.setFocusPainted(false);
             btnPokemon.setContentAreaFilled(true);
             btnPokemon.setBackground(Color.WHITE);
+            registrarBoton(nombre, btnPokemon);
             
             btnPokemon.addMouseListener(new MouseAdapter(){
-                public void MouseEntered(MouseEvent e){
+                @Override
+                public void mouseEntered(MouseEvent e){
                     btnPokemon.setBackground(new Color(200,200,255));
                     btnPokemon.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 }
+                @Override
                 public void mouseExited(MouseEvent e){
                     btnPokemon.setBackground(UIManager.getColor("Button.background"));
                 }
@@ -115,9 +134,11 @@ public class SeleccionPokemonGUI extends JFrame {
             
             btnPokemon.addActionListener(e -> {
                     seleccionarPokemon(nombre);
-            btnPokemon.setBorder(BorderFactory.createLineBorder(Color.YELLOW,3));
             });   
            panelCentral.add(btnPokemon);
+
+            index++;
+            actual = catalogo.obtener(index);
         }
         JPanel contenedor = new JPanel(new GridBagLayout());
         contenedor.setOpaque(false);
@@ -173,6 +194,56 @@ public class SeleccionPokemonGUI extends JFrame {
         fondo.add(sur,BorderLayout.SOUTH);
     }
 
+    private ListaPokemon crearCatalogo(){
+        ListaPokemon lista = new ListaPokemon();
+        lista.agregar(new Snorlax());
+        lista.agregar(new Meowth());
+        lista.agregar(new Pidgey());
+        lista.agregar(new Charmander());
+        lista.agregar(new Growlithe());
+        lista.agregar(new Magmar());
+        lista.agregar(new Squirtle());
+        lista.agregar(new Psyduck());
+        lista.agregar(new Poliwag());
+        return lista;
+    }
+
+    private void registrarBoton(String nombre, JButton boton) {
+        NodoBoton nuevo = new NodoBoton(nombre, boton);
+        if (botones == null) {
+            botones = nuevo;
+        } else {
+            NodoBoton actual = botones;
+            while (actual.siguiente != null) {
+                actual = actual.siguiente;
+            }
+            actual.siguiente = nuevo;
+        }
+    }
+
+    private JButton buscarBoton(String nombre) {
+        NodoBoton actual = botones;
+        while (actual != null) {
+            if (actual.nombre.equals(nombre)) {
+                return actual.boton;
+            }
+            actual = actual.siguiente;
+        }
+        return null;
+    }
+
+    private void setBotonHabilitado(String nombre, boolean habilitado) {
+        JButton boton = buscarBoton(nombre);
+        if (boton != null) {
+            boton.setEnabled(habilitado);
+            if (habilitado) {
+                boton.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+            } else {
+                boton.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
+            }
+        }
+    }
+
     private JLabel crearLabelSeleccion(int posicion){
         JLabel lbl = new JLabel();
         lbl.setBorder(BorderFactory.createLineBorder(Color.BLACK,2));
@@ -198,7 +269,8 @@ public class SeleccionPokemonGUI extends JFrame {
 
             String resultado = jugador.agregarPokemon(nuevoPokemon);
 
-            if(!resultado.contains("No se permiten")){
+            boolean agregado = resultado.contains("fue agregado");
+            if(agregado){
 
                 cantidadSeleccionada++;
                 ImageIcon icon = cargarImagen("/pokemonproyecto/img/"+nombre.toLowerCase()+".png",80,80);
@@ -216,6 +288,7 @@ public class SeleccionPokemonGUI extends JFrame {
                     seleccion4.setIcon(icon);
                     nombreSeleccion4 = nombre;
                 }
+                setBotonHabilitado(nombre, false);
             }
 
             lblMensaje.setText(resultado);
@@ -241,37 +314,67 @@ public class SeleccionPokemonGUI extends JFrame {
     }
 
     private void deseleccionarPokemon(int posicion){
-        cantidadSeleccionada--;
-
+        String nombre = null;
         switch(posicion){
-            case 1: seleccion1.setIcon(null); break;
-            case 2: seleccion2.setIcon(null); break;
-            case 3: seleccion3.setIcon(null); break;
-            case 4: seleccion4.setIcon(null); break;
+            case 1:
+                if(seleccion1.getIcon() == null){ return; }
+                nombre = nombreSeleccion1;
+                seleccion1.setIcon(null);
+                nombreSeleccion1 = null;
+                break;
+            case 2:
+                if(seleccion2.getIcon() == null){ return; }
+                nombre = nombreSeleccion2;
+                seleccion2.setIcon(null);
+                nombreSeleccion2 = null;
+                break;
+            case 3:
+                if(seleccion3.getIcon() == null){ return; }
+                nombre = nombreSeleccion3;
+                seleccion3.setIcon(null);
+                nombreSeleccion3 = null;
+                break;
+            case 4:
+                if(seleccion4.getIcon() == null){ return; }
+                nombre = nombreSeleccion4;
+                seleccion4.setIcon(null);
+                nombreSeleccion4 = null;
+                break;
+            default:
+                return;
+        }
+
+        if (nombre != null) {
+            boolean eliminado = jugador.eliminarPokemon(nombre);
+            setBotonHabilitado(nombre, true);
+            if (eliminado && cantidadSeleccionada > 0) {
+                cantidadSeleccionada--;
+            }
         }
 
         lblMensaje.setText(cantidadSeleccionada + "/4 Pokémon seleccionados");
     }
 
     private void comenzarBatalla(){
+        String nombreJugador = txtNombre != null ? txtNombre.getText().trim() : "";
+        if(nombreJugador.isEmpty()){
+            lblMensaje.setText("Debes escribir tu nombre");
+            return;
+        }
+        jugador.setNombre(nombreJugador);
         if(cantidadSeleccionada == 4){
-            //CPU vacio
+            detenerMusica();
             JugadorCPU cpu = new JugadorCPU("CPU", new ColaTurnos());
-            
-            //Crear torneo
-            ArbolTorneo torneo = new ArbolTorneo();
-            
-            //Obtener primer equipo del torneo 
+
+            ArbolTorneo torneo = new ArbolTorneo(jugador.getNombre());
             ListaPokemon equipoCPU = torneo.getEquipoActualCPU();
-            
-            //Pokemones a CPU
+
             NodoPokemon actual = equipoCPU.getCabeza();
             while(actual != null){
                 cpu.agregarPokemonCPU(actual.pokemon);
                 actual = actual.siguiente;
             }
-            // Crear combate 
-            Combate combate = new Combate(jugador,cpu);
+            Combate combate = new Combate(jugador, cpu, torneo);
             combate.setVisible(true);
             dispose();
             
@@ -291,7 +394,6 @@ public class SeleccionPokemonGUI extends JFrame {
         } 
         clip.start();
         }catch(Exception e){
-            e.printStackTrace();
         }
     }
 
@@ -302,8 +404,8 @@ public class SeleccionPokemonGUI extends JFrame {
         }
     }
 
-    public static void main(String[] args){
-        new SeleccionPokemonGUI().setVisible(true);
-    }
 }
+
+
+
 
