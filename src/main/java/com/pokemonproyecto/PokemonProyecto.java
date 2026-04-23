@@ -1,16 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
 
 package com.pokemonproyecto;
 
-/**
- *
- * @author steve
- */
 public class PokemonProyecto {
 
-    public static void main(String[] args) {
-        
-    }
 }

@@ -408,6 +408,6 @@ public class ArbolTorneo {
 
     public int getCombateEnRonda() {
         return combateEnRonda;
-    } 
+    }
 }
 
