@@ -45,7 +45,6 @@ public class ListaPokemon {
         NodoPokemon actual = cabeza;
         int i = 0;
         while (actual != null) {
-            System.out.println(i + ". " + actual.pokemon.toString());
             actual = actual.siguiente;
             i++;
         }
@@ -55,4 +54,6 @@ public class ListaPokemon {
 }
 
     
+
+
 
