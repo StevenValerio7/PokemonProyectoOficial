@@ -1,17 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package modelo;
 
-/**
- *
- * @author jimen
- */
 public abstract class Pokemon {
      private String nombre;
     private String tipo;
     private int hp;
+    private int hpMaximo;
     private int ataque;
     private int defensa;
     private int ataqueEspecial;
@@ -24,6 +17,7 @@ public abstract class Pokemon {
         this.nombre = nombre;
         this.tipo = tipo;
         this.hp = hp;
+        this.hpMaximo = hp;
         this.ataque = ataque;
         this.defensa = defensa;
         this.ataqueEspecial = ataqueEspecial;
@@ -43,6 +37,10 @@ public abstract class Pokemon {
 
     public int getHp() {
         return hp;
+    }
+
+    public int getHpMaximo() {
+        return hpMaximo;
     }
 
     public int getAtaque() {

@@ -1,14 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package modelo;
 import estructuras.NodoPokemon;
 import estructuras.ColaTurnos;
-/**
- *
- * @author jimen
- */
+import estructuras.ListaPokemon;
 public class Jugador {
     private String nombre;
     protected ColaTurnos pokedex;
@@ -20,6 +13,12 @@ public class Jugador {
 
     public String getNombre() {
         return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        if (nombre != null && !nombre.trim().isEmpty()) {
+            this.nombre = nombre.trim();
+        }
     }
     private int contarRepetidos(String nombre){
         int contador=0;
@@ -58,6 +57,54 @@ public class Jugador {
             return; //maximo dos iguales 
         }
         pokedex.encolar(new NodoPokemon(p));
+    }
+
+    public ListaPokemon obtenerEquipo(){
+        ListaPokemon lista = new ListaPokemon();
+        ColaTurnos temporal = new ColaTurnos();
+        while(!pokedex.estaVacia()){
+            NodoPokemon nodo = pokedex.desencolar();
+            lista.agregar(nodo.pokemon);
+            temporal.encolar(nodo);
+        }
+        while(!temporal.estaVacia()){
+            pokedex.encolar(temporal.desencolar());
+        }
+        return lista;
+    }
+
+    public boolean cambiarPokemonA(String nombrePokemon){
+        if(pokedex.estaVacia()){
+            return false;
+        }
+        int vueltas = pokedex.getTamano();
+        for(int i = 0; i < vueltas; i++){
+            if(pokedex.verFrente().pokemon.getNombre().equals(nombrePokemon)){
+                return true;
+            }
+            pokedex.cambiarPokemonActivo();
+        }
+        return false;
+    }
+
+    public boolean eliminarPokemon(String nombre){
+        if(pokedex.estaVacia()){
+            return false;
+        }
+        ColaTurnos temporal = new ColaTurnos();
+        boolean eliminado = false;
+        while(!pokedex.estaVacia()){
+            NodoPokemon nodo = pokedex.desencolar();
+            if(!eliminado && nodo.pokemon.getNombre().equals(nombre)){
+                eliminado = true;
+            } else {
+                temporal.encolar(nodo);
+            }
+        }
+        while(!temporal.estaVacia()){
+            pokedex.encolar(temporal.desencolar());
+        }
+        return eliminado;
     }
     
     

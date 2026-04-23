@@ -1,16 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package modelo;
 
 import estructuras.ColaTurnos;
 import estructuras.ListaPokemon;
 
-/**
- *
- * @author jimen
- */
 public class JugadorCPU extends Jugador {
 
     public JugadorCPU(String nombre, ColaTurnos pokedex) {
@@ -42,7 +34,7 @@ public class JugadorCPU extends Jugador {
      
     @Override
     public String cambiarPokemon(){
-        return "CPU no cambia de jugador";
+        return "CPU no cambia de Pokemon";
     }
     
     
