@@ -38,7 +38,7 @@ public class PantallaDerrota extends JFrame {
         fondo.setLayout(new BorderLayout());
         setContentPane(fondo);
 
-        JLabel lblTitulo = new JLabel("¡Has perdido!", SwingConstants.CENTER);
+        JLabel lblTitulo = new JLabel("Has perdido!", SwingConstants.CENTER);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 28));
         lblTitulo.setForeground(Color.WHITE);
         fondo.add(lblTitulo, BorderLayout.NORTH);
@@ -52,7 +52,7 @@ public class PantallaDerrota extends JFrame {
 
         JPanel panelBoton = new JPanel();
         panelBoton.setOpaque(false);
-        JButton btnVer = new JButton("Ver Torneo");
+        JButton btnVer = new JButton("Ver torneo");
         btnVer.addActionListener(e -> dispose());
         JButton btnSalir = new JButton("Salir");
         btnSalir.addActionListener(e -> System.exit(0));

@@ -1,6 +1,7 @@
 package principal;
 
 import gui.SeleccionPokemonGUI;
+import javax.swing.SwingUtilities;
 
 public class BarraProgreso extends javax.swing.JFrame {
 
@@ -48,22 +49,27 @@ public class BarraProgreso extends javax.swing.JFrame {
         new Thread(() -> {
             try {
                 for (int i = 0; i <= 100; i++) {
+                    final int progreso = i;
                     Thread.sleep(65);
-                    LoadingValue.setText(i + "%");
+                    SwingUtilities.invokeLater(() -> {
+                        LoadingValue.setText(progreso + "%");
 
-                    if (i == 10) LoadingLabel.setText("Cargando el Sistema");
-                    if (i == 20) LoadingLabel.setText("Cargando Gr\u00E1ficos");
-                    if (i == 30) LoadingLabel.setText("Cargando los Servidores");
-                    if (i == 50) LoadingLabel.setText("Creando Combates");
-                    if (i == 60) LoadingLabel.setText("Corriendo el Programa");
-                    if (i == 80) LoadingLabel.setText("Actualizando el Sistema");
-                    if (i == 90) LoadingLabel.setText("Ya casi est\u00E1 listo");
+                        if (progreso == 10) LoadingLabel.setText("Cargando el Sistema");
+                        if (progreso == 20) LoadingLabel.setText("Cargando Graficos");
+                        if (progreso == 30) LoadingLabel.setText("Cargando los Servidores");
+                        if (progreso == 50) LoadingLabel.setText("Creando Combates");
+                        if (progreso == 60) LoadingLabel.setText("Corriendo el Programa");
+                        if (progreso == 80) LoadingLabel.setText("Actualizando el Sistema");
+                        if (progreso == 90) LoadingLabel.setText("Ya casi esta listo");
 
-                    LoadingBar.setValue(i);
+                        LoadingBar.setValue(progreso);
+                    });
                 }
 
-                dispose();
-                new SeleccionPokemonGUI().setVisible(true);
+                SwingUtilities.invokeLater(() -> {
+                    dispose();
+                    new SeleccionPokemonGUI().setVisible(true);
+                });
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
