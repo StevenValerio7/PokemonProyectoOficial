@@ -38,15 +38,11 @@ public class JugadorCPU extends Jugador {
         }
         return resultado;
     }
-            
-     
+    
+    
     @Override
-    public String cambiarPokemon(){
+    public String cambiarPokemonB(){
         return "CPU no cambia de jugador";
     }
-    
-    
-   
-    
-    
+ 
 }
