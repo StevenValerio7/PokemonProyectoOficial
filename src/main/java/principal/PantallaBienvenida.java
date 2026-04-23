@@ -36,7 +36,6 @@ public class PantallaBienvenida extends javax.swing.JFrame {
     }
 
     private void reproducirMusica(String archivo, boolean loop){
-      private void reproducirMusica(String archivo, boolean loop){
         try{
             AudioInputStream audio = AudioSystem.getAudioInputStream(getClass().getResource("/sonido/"+archivo));
             clip = AudioSystem.getClip();
