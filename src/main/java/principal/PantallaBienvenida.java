@@ -8,7 +8,10 @@ import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
 
-
+/**
+ *
+ * @author ortiz
+ */
 public class PantallaBienvenida extends javax.swing.JFrame {
 
     private Clip clip; // Clip para manejar la reproducción de audio
@@ -32,7 +35,7 @@ public class PantallaBienvenida extends javax.swing.JFrame {
         }
     }
 
-     private void reproducirMusica(String archivo, boolean loop){
+    private void reproducirMusica(String archivo, boolean loop){
         try{
             AudioInputStream audio = AudioSystem.getAudioInputStream(getClass().getResource("/sonido/"+archivo));
             clip = AudioSystem.getClip();
@@ -67,29 +70,30 @@ public class PantallaBienvenida extends javax.swing.JFrame {
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 0));
-        jLabel1.setText("Prepárate para la aventura Pokémon!");
-        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 60, 270, 110));
+        jLabel1.setFont(new java.awt.Font("Pokemon Classic", 0, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("¿Estás listo para la Pokeaventura?");
+        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 20, 500, 220));
 
-        jButton1.setBackground(new java.awt.Color(0, 0, 153));
-        jButton1.setFont(new java.awt.Font("Arial Black", 0, 12)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 0));
+        jButton1.setBackground(new java.awt.Color(0, 0, 0));
+        jButton1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Iniciar el Juego");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 220, -1, -1));
+        jPanel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 220, -1, -1));
 
-        jButton2.setBackground(new java.awt.Color(0, 0, 153));
-        jButton2.setFont(new java.awt.Font("Arial Black", 0, 12)); // NOI18N
-        jButton2.setForeground(new java.awt.Color(255, 255, 0));
+        jButton2.setBackground(new java.awt.Color(0, 0, 0));
+        jButton2.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setText("Salir");
         jPanel2.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 260, -1, -1));
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/proyectoprokemon/gif/CQx.gif"))); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/pokemonproyecto/gif/CQx.gif"))); // NOI18N
         jLabel2.setText("jLabel2");
         jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 460, 300));
 
@@ -139,10 +143,13 @@ System.exit(0);    }//GEN-LAST:event_jButton2ActionPerformed
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
             public void run() {
                 new PantallaBienvenida().setVisible(true);
             }

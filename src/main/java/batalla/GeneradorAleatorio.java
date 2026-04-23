@@ -1,0 +1,15 @@
+package batalla;
+
+public class GeneradorAleatorio {
+
+    private int valor;
+
+    public GeneradorAleatorio() {
+        valor = 42;
+    }
+
+    public int siguiente(int limite) {
+        valor = (valor + 7) % 100;
+        return valor % limite;
+    }
+}
